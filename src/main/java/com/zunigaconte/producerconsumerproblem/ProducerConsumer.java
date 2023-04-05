@@ -7,12 +7,15 @@ public class ProducerConsumer {
     public static void main(String[] args) {
         SharedQueue sharedQueue = new SharedQueue(new LinkedList<>(), 2);
         Producer producer = new Producer(sharedQueue);
-        Consumer consumer = new Consumer(sharedQueue, "ConsumerOne", 10);
+        Consumer consumerOne = new Consumer(sharedQueue, "ConsumerOne", 10);
+        Consumer consumerTwo = new Consumer(sharedQueue, "ConsumerTwo", 10);
 
         Thread p = new Thread(producer, "Producer Thread");
-        Thread c = new Thread(consumer, "Consumer Thread");
+        Thread cOne = new Thread(consumerOne, "Consumer one Thread");
+        Thread cTwo = new Thread(consumerTwo, "Consumer two Thread");
 
         p.start();
-        c.start();
+        cOne.start();
+        cTwo.start();
     }
 }
