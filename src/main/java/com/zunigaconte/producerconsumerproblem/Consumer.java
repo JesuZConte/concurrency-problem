@@ -12,21 +12,37 @@ public class Consumer implements Runnable {
         this.consumerCapacity = consumerCapacity;
     }
 
+//    public void consume() throws InterruptedException {
+//        synchronized (sharedQueue) {
+//            if (sharedQueue.getQueue().size() == 0) {
+//                System.out.println("Queue is empty. " + consumerName + " is waiting...");
+//                sharedQueue.wait();
+//                System.out.println(consumerName + " has woken up!");
+//            }
+//        }
+//
+//        synchronized (sharedQueue) {
+//            String item = sharedQueue.getQueue().remove();
+//            System.out.println(consumerName + " has consumed " + item);
+//            sharedQueue.notify();
+//        }
+//    }
+
     public void consume() throws InterruptedException {
-        synchronized (sharedQueue) {
-            if (sharedQueue.getQueue().size() == 0) {
-                System.out.println("Queue is empty. " + consumerName + " is waiting...");
-                sharedQueue.wait();
-                System.out.println(consumerName + " has woken up!");
-            }
+        sharedQueue.getQueueLock().lock();
+        if (sharedQueue.getQueue().size() == 0) {
+            System.out.println("Queue is empty. " + consumerName + " is waiting...");
+            sharedQueue.getNotEmpty().await();
+            System.out.println(consumerName + " has woken up!");
         }
 
-        synchronized (sharedQueue) {
-            String item = sharedQueue.getQueue().remove();
-            System.out.println(consumerName + " has consumed " + item);
-            sharedQueue.notify();
-        }
+        String item = sharedQueue.getQueue().remove();
+        System.out.println(consumerName + " has consumed " + item);
+
+        sharedQueue.getNotFull().signal();
+        sharedQueue.getQueueLock().unlock();
     }
+
 
     @Override
     public void run() {
